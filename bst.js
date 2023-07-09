@@ -25,6 +25,15 @@ function sortArray(array) {
   return array;
 }
 
+function minValue(root) {
+  let minv = root.value;
+  while (root.left != null) {
+    minv = root.left.key;
+    root = root.left;
+  }
+  return minv;
+}
+
 class Node {
   constructor(value) {
     this.value = value;
@@ -39,7 +48,7 @@ class Tree {
   }
 
   buildTree(arr) {
-    function build(arr, start, end) {
+    function buildRec(arr, start, end) {
       if (start > end) {
         return null;
       }
@@ -47,8 +56,8 @@ class Tree {
 
       const node = new Node(arr[mid]);
 
-      node.left = build(arr, start, mid - 1);
-      node.right = build(arr, mid + 1, end);
+      node.left = buildRec(arr, start, mid - 1);
+      node.right = buildRec(arr, mid + 1, end);
 
       return node;
     }
@@ -57,42 +66,82 @@ class Tree {
     const uniqueArray = Array.from(set);
     const sortedArray = sortArray(uniqueArray);
 
-    return build(sortedArray, 0, sortedArray.length - 1);
+    return buildRec(sortedArray, 0, sortedArray.length - 1);
   }
 
   insert(value) {
+    function insertRec(node, currentNode) {
+      if (node.value < currentNode.value) {
+        if (currentNode.left === null) {
+          currentNode.left = node;
+        } else {
+          insertRec(node, currentNode.left);
+        }
+      } else {
+        if (currentNode.right === null) {
+          currentNode.right = node;
+        } else {
+          insertRec(node, currentNode.right);
+        }
+      }
+    }
+
     const node = new Node(value);
 
     if (this.root === null) {
       this.root = node;
     } else {
-      this._insert(node, this.root);
+      insertRec(node, this.root);
     }
   }
 
-  _insert(node, currentNode) {
-    if (node.value < currentNode.value) {
-      if (currentNode.left === null) {
-        currentNode.left = node;
-      } else {
-        this._insert(node, currentNode.left);
-      }
+  delete(value, root = this.root) {
+    if (root === null) {
+      return root;
+    }
+    if (root.value < value) {
+      root.right = this.delete(value, root.right);
+    } else if (root.value > value) {
+      root.left = this.delete(value, root.left);
     } else {
-      if (currentNode.right === null) {
-        currentNode.right = node;
-      } else {
-        this._insert(node, currentNode.right);
+      if (root.left === null) {
+        return root.right;
+      } else if (root.right === null) {
+        return root.left;
       }
+      root.value = minValue(root.right)
+      root.right = this.delete(value, root.right);
     }
+
+    return root;
   }
 
-  delete(value) {}
+  find(value) {}
+
+  levelOrder() {}
+
+  inOrder() {}
+
+  preOrder() {}
+
+  postOrder() {}
+
+  height(node) {}
+
+  depth(node) {}
+
+  isBalanced() {}
+
+  reBalance() {}
 }
 
 let tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 
+prettyPrint(tree.root);
+
 tree.insert(15);
 tree.insert(55);
 tree.insert(5473895432);
+tree.delete(4);
 
 prettyPrint(tree.root);
