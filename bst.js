@@ -34,8 +34,8 @@ class Node {
 }
 
 class Tree {
-  constructor() {
-    this.root = null;
+  constructor(arr) {
+    this.root = this.buildTree(arr);
   }
 
   buildTree(arr) {
@@ -55,19 +55,44 @@ class Tree {
 
     const set = new Set(arr);
     const uniqueArray = Array.from(set);
-    const sortedArray = sortArray(uniqueArray)
+    const sortedArray = sortArray(uniqueArray);
 
     return build(sortedArray, 0, sortedArray.length - 1);
   }
 
-  insert(value) {}
+  insert(value) {
+    const node = new Node(value);
+
+    if (this.root === null) {
+      this.root = node;
+    } else {
+      this._insert(node, this.root);
+    }
+  }
+
+  _insert(node, currentNode) {
+    if (node.value < currentNode.value) {
+      if (currentNode.left === null) {
+        currentNode.left = node;
+      } else {
+        this._insert(node, currentNode.left);
+      }
+    } else {
+      if (currentNode.right === null) {
+        currentNode.right = node;
+      } else {
+        this._insert(node, currentNode.right);
+      }
+    }
+  }
 
   delete(value) {}
 }
 
-arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
+let tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
 
-const tree = new Tree();
-let builtTree = tree.buildTree(arr);
+tree.insert(15);
+tree.insert(55);
+tree.insert(5473895432);
 
-prettyPrint(builtTree);
+prettyPrint(tree.root);
